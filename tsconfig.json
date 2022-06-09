@@ -16,6 +16,14 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@nestjs-toolkit/auth": [
+        "libs/auth/src"
+      ],
+      "@nestjs-toolkit/auth/*": [
+        "libs/auth/src/*"
+      ]
+    }
   }
 }

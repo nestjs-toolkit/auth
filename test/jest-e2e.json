@@ -1,9 +1,17 @@
 {
-  "moduleFileExtensions": ["js", "json", "ts"],
+  "moduleFileExtensions": [
+    "js",
+    "json",
+    "ts"
+  ],
   "rootDir": ".",
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "moduleNameMapper": {
+    "@nestjs-toolkit/auth/(.*)": "<rootDir>/../libs/auth/src/$1",
+    "@nestjs-toolkit/auth": "<rootDir>/../libs/auth/src"
   }
 }
