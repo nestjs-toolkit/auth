@@ -5,6 +5,7 @@ import { JwtStrategy } from './strategies';
 import { AuthService } from './auth.service';
 import { AuthConfig } from './auth.config';
 import { AUTH_CONFIG } from './constants';
+import { AclService } from './acl';
 
 const defaultConfig: AuthConfig = {
   jwtSecret: 'secret-test',
@@ -16,7 +17,7 @@ const defaultConfig: AuthConfig = {
 
 @Module({})
 export class ToolkitAuthModule {
-  static forRoot(config: Partial<AuthConfig>): DynamicModule {
+  static forRoot(config: AuthConfig): DynamicModule {
     const customConfig = {
       ...defaultConfig,
       config,
@@ -46,8 +47,9 @@ export class ToolkitAuthModule {
         },
         JwtStrategy,
         AuthService,
+        AclService,
       ],
-      exports: [AuthService],
+      exports: [AuthService, AclService],
       global: true,
     };
   }

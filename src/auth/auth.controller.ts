@@ -7,19 +7,28 @@ import {
   Post,
   Request,
 } from '@nestjs/common';
-import { Public, UserRequest } from '@nestjs-toolkit/auth/decorators';
-import { AuthService } from '@nestjs-toolkit/auth';
+import {
+  AuthAclPerms,
+  AuthAclRoles,
+  Public,
+  UserRequest,
+} from '@nestjs-toolkit/auth/decorators';
+import { AclService, AuthService } from '@nestjs-toolkit/auth';
 import {
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs-toolkit/base/exceptions';
 import { UserAuthenticated } from '@nestjs-toolkit/auth/user';
+import { PermissionEnum, RoleEnum } from './enum';
 
 @Controller('auth')
 export class AuthController {
   private readonly logger = new Logger(AuthController.name);
 
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly aclService: AclService,
+  ) {}
 
   @Public()
   @Post('register')
@@ -56,5 +65,28 @@ export class AuthController {
   @Get('me')
   me(@UserRequest() user: UserAuthenticated) {
     return user;
+  }
+
+  @Public()
+  @Get('/acl')
+  async getAcl() {
+    return this.aclService.getData();
+  }
+
+  @Get('/acl/only-role-user')
+  @AuthAclRoles(RoleEnum.User, 'foo')
+  async onlyRoleUser() {
+    return {
+      message: 'Authorized',
+    };
+  }
+
+  @Get('/acl/only-perms-post-write')
+  @AuthAclPerms(PermissionEnum.PostWrite)
+  async onlyPermsPostRead(@Request() req) {
+    return {
+      message: 'Authorized',
+      roles: req.acl.getRoles(),
+    };
   }
 }
