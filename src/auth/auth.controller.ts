@@ -7,12 +7,13 @@ import {
   Post,
   Request,
 } from '@nestjs/common';
-import { AuthPublic } from '@nestjs-toolkit/auth/decorators';
+import { Public, UserRequest } from '@nestjs-toolkit/auth/decorators';
 import { AuthService } from '@nestjs-toolkit/auth';
 import {
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs-toolkit/base/exceptions';
+import { UserAuthenticated } from '@nestjs-toolkit/auth/user';
 
 @Controller('auth')
 export class AuthController {
@@ -20,7 +21,7 @@ export class AuthController {
 
   constructor(private readonly authService: AuthService) {}
 
-  @AuthPublic()
+  @Public()
   @Post('register')
   async register(@Body() body) {
     try {
@@ -36,7 +37,7 @@ export class AuthController {
     }
   }
 
-  @AuthPublic()
+  @Public()
   @Post('login')
   @HttpCode(200)
   async login(@Body() body) {
@@ -53,7 +54,7 @@ export class AuthController {
   }
 
   @Get('me')
-  me(@Request() req) {
-    return req.user;
+  me(@UserRequest() user: UserAuthenticated) {
+    return user;
   }
 }

@@ -1,4 +1,4 @@
-import { User } from './user';
+import { UserAuthenticated, UserEntity } from './user.type';
 import { IUserStore } from './i-user.store';
 
 export abstract class AbstractUserStore implements IUserStore {
@@ -6,13 +6,16 @@ export abstract class AbstractUserStore implements IUserStore {
     username: string,
     passwordHash: string,
     data?: Record<string, any>,
-  ): Promise<User>;
+  ): Promise<UserAuthenticated>;
 
-  abstract findById(id: string): Promise<User>;
+  abstract findById(id: string): Promise<UserEntity>;
 
-  abstract findByUsername(username: string): Promise<User>;
+  abstract findByUsername(username: string): Promise<UserEntity>;
 
-  abstract update(id: string, data: Partial<User>): Promise<User>;
+  abstract update(
+    id: string,
+    data: Partial<UserEntity>,
+  ): Promise<UserAuthenticated>;
 
   abstract updateUsername(id: string, username: string): Promise<boolean>;
 
@@ -24,8 +27,8 @@ export abstract class AbstractUserStore implements IUserStore {
     return this.update(id, { roles }).then(() => true);
   }
 
-  updateWorkspace(id: string, workspace: string): Promise<boolean> {
-    return this.update(id, { workspace }).then(() => true);
+  updateAccount(id: string, account: string): Promise<boolean> {
+    return this.update(id, { account }).then(() => true);
   }
 
   updatePassword(id: string, passwordHash: string): Promise<boolean> {
@@ -33,11 +36,11 @@ export abstract class AbstractUserStore implements IUserStore {
   }
 
   presentJwtPayload(
-    user: User,
+    user: UserAuthenticated,
     additionalPayload?: Record<string, any>,
   ): Record<string, any> {
     return {
-      workspace: user.workspace?.toString(),
+      account: user.account?.toString(),
       ...additionalPayload,
       user: {
         id: user.id,

@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { JwtSignOptions } from '@nestjs/jwt/dist/interfaces';
 import { UnauthorizedException } from '@nestjs-toolkit/base/exceptions';
-import { IUserStore, User } from './user';
+import { IUserStore, UserAuthenticated } from './user';
 import { AUTH_USER_STORE } from './constants';
 
 type JwtResponse = { accessToken: string; expiresIn: number };
@@ -22,7 +22,10 @@ export class AuthService implements OnModuleInit {
     this.userStore = this.moduleRef.get(AUTH_USER_STORE, { strict: false });
   }
 
-  public async login(username: string, password: string): Promise<User> {
+  public async login(
+    username: string,
+    password: string,
+  ): Promise<UserAuthenticated> {
     const user = await this.userStore.findByUsername(username);
     if (!user) {
       throw new UnauthorizedException('User not found', 'USER_NOT_FOUND');
@@ -45,7 +48,7 @@ export class AuthService implements OnModuleInit {
   }
 
   public signJwt(
-    user: User,
+    user: UserAuthenticated,
     additionalPayload?: any,
     options?: JwtSignOptions,
   ): JwtResponse {
@@ -70,8 +73,7 @@ export class AuthService implements OnModuleInit {
     username: string,
     password: string,
     data?: Record<string, any>,
-  ): Promise<User> {
-    // TODO validate DTO
+  ): Promise<UserAuthenticated> {
     const hash = await this.hashPassword(password);
     return this.userStore.create(username, hash, data);
   }
@@ -92,19 +94,19 @@ export class AuthService implements OnModuleInit {
     return this.userStore.updateRequiredAction(id, changePassword);
   }
 
-  async updateWorkspace(id: string, workspace: string): Promise<boolean> {
-    return this.userStore.updateWorkspace(id, workspace);
+  async updateAccount(id: string, account: string): Promise<boolean> {
+    return this.userStore.updateAccount(id, account);
   }
 
   async updateRoles(id: string, roles: string[]): Promise<boolean> {
     return this.userStore.updateRoles(id, roles);
   }
 
-  async findById(id: string): Promise<User> {
+  async findById(id: string): Promise<UserAuthenticated> {
     return this.userStore.findById(id);
   }
 
-  async findByUsername(username: string): Promise<User> {
+  async findByUsername(username: string): Promise<UserAuthenticated> {
     return this.userStore.findByUsername(username);
   }
 

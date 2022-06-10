@@ -9,7 +9,7 @@ export const META_ACL_PERMS = 'toolkit_auth_acl_perms';
 // export const AuthGuest = () => SetMetadata(META_AUTH_GUEST, true);
 
 // Defini uma rota como PUBLICA, ou seja nao ira precisar informar token e caso informado ira ignorar a validacao do token
-export const AuthPublic = () => SetMetadata(META_AUTH_PUBLIC, true);
+export const Public = () => SetMetadata(META_AUTH_PUBLIC, true);
 
 export const AuthAclRoles = (...roles: string[]) =>
   SetMetadata(META_ACL_ROLES, roles);

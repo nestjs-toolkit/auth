@@ -8,7 +8,7 @@ import {
   AuthService,
   ToolkitAuthModule,
 } from '@nestjs-toolkit/auth';
-import { IUserStore, User } from '@nestjs-toolkit/auth/user';
+import { IUserStore, UserAuthenticated } from '@nestjs-toolkit/auth/user';
 
 const mockStore: Partial<IUserStore> = {
   findByUsername: jest.fn().mockResolvedValue({ id: 'fake' }),

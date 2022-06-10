@@ -5,12 +5,12 @@ import {
 } from '@nestjs/platform-fastify';
 import { AppModule } from '../src/app.module';
 import { AuthService } from '@nestjs-toolkit/auth';
-import { User } from '@nestjs-toolkit/auth/user';
+import { UserAuthenticated } from '@nestjs-toolkit/auth/user';
 
 describe('AuthController (e2e)', () => {
   let app: NestFastifyApplication;
   let authService: AuthService;
-  let user: User;
+  let user: UserAuthenticated;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -272,13 +272,13 @@ describe('AuthController (e2e)', () => {
       expect(response.requiredAction).toBe(action);
     });
 
-    it('Update Workspace', async () => {
-      const workspace = 'x1x2x3';
-      const result = await authService.updateWorkspace(user.id, workspace);
+    it('Update Account', async () => {
+      const account = 'x1x2x3';
+      const result = await authService.updateAccount(user.id, account);
       expect(result).toBeTruthy();
 
       const response = await authService.findById(user.id);
-      expect(response.workspace).toBe(workspace);
+      expect(response.account).toBe(account);
     });
 
     it('Update Roles', async () => {

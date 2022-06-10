@@ -1,8 +1,12 @@
 import { randomUUID } from 'crypto';
 import { Injectable } from '@nestjs/common';
-import { AbstractUserStore, User } from '@nestjs-toolkit/auth/user';
+import {
+  AbstractUserStore,
+  UserAuthenticated,
+  UserEntity,
+} from '@nestjs-toolkit/auth/user';
 
-const DATA_USER: Array<User> = [];
+const DATA_USER: Array<UserEntity> = [];
 
 @Injectable()
 export class FakeUserStore extends AbstractUserStore {
@@ -10,14 +14,14 @@ export class FakeUserStore extends AbstractUserStore {
     username: string,
     passwordHash: string,
     data?: Record<string, any>,
-  ): Promise<User> {
+  ): Promise<UserAuthenticated> {
     const hasUser = await this.findByUsername(username);
 
     if (hasUser) {
       throw new Error('User already exists');
     }
 
-    const newUser: User = {
+    const newUser: UserEntity = {
       id: randomUUID(),
       username,
       password: passwordHash,
@@ -26,18 +30,21 @@ export class FakeUserStore extends AbstractUserStore {
 
     DATA_USER.push(newUser);
 
-    return Promise.resolve(newUser);
+    return Promise.resolve(new UserAuthenticated(newUser));
   }
 
-  async findById(id: string): Promise<User> {
+  async findById(id: string): Promise<UserEntity> {
     return DATA_USER.find((u) => u.id === id) || null;
   }
 
-  async findByUsername(username: string): Promise<User> {
+  async findByUsername(username: string): Promise<UserEntity> {
     return DATA_USER.find((u) => u.username === username) || null;
   }
 
-  async update(id: string, data: Partial<User>): Promise<User> {
+  async update(
+    id: string,
+    data: Partial<UserAuthenticated>,
+  ): Promise<UserAuthenticated> {
     const indexOfUser = DATA_USER.findIndex((u) => u.id === id);
 
     if (indexOfUser === -1) {
@@ -49,7 +56,7 @@ export class FakeUserStore extends AbstractUserStore {
       ...data,
     };
 
-    return DATA_USER[indexOfUser];
+    return new UserAuthenticated(DATA_USER[indexOfUser]);
   }
 
   async updateUsername(id: string, username: string): Promise<boolean> {
