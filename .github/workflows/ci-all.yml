@@ -25,9 +25,6 @@ jobs:
       - name: Lint
         run: yarn lint
 
-      - name: Unit test
-        run: yarn test
-
       - name: Testing e2e + coverage
         run: yarn test:e2e:cov
 
