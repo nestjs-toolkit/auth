@@ -1,22 +1,27 @@
 import { randomUUID } from 'crypto';
 import { Injectable } from '@nestjs/common';
-import { AbstractUserStore, User, UserDto } from '@nestjs-toolkit/auth/user';
+import { AbstractUserStore, User } from '@nestjs-toolkit/auth/user';
 
 const DATA_USER: Array<User> = [];
 
 @Injectable()
 export class FakeUserStore extends AbstractUserStore {
-  async create(dto: UserDto, passwordHash: string): Promise<User> {
-    const hasUser = await this.findByUsername(dto.username);
+  async create(
+    username: string,
+    passwordHash: string,
+    data?: Record<string, any>,
+  ): Promise<User> {
+    const hasUser = await this.findByUsername(username);
 
     if (hasUser) {
       throw new Error('User already exists');
     }
 
     const newUser: User = {
-      ...dto,
       id: randomUUID(),
+      username,
       password: passwordHash,
+      ...data,
     };
 
     DATA_USER.push(newUser);
@@ -45,5 +50,15 @@ export class FakeUserStore extends AbstractUserStore {
     };
 
     return DATA_USER[indexOfUser];
+  }
+
+  async updateUsername(id: string, username: string): Promise<boolean> {
+    const hasUser = await this.findByUsername(username);
+
+    if (hasUser) {
+      throw new Error('Username already exists');
+    }
+
+    return this.update(id, { username }).then(() => true);
   }
 }

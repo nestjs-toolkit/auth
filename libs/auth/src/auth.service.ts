@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { JwtSignOptions } from '@nestjs/jwt/dist/interfaces';
 import { UnauthorizedException } from '@nestjs-toolkit/base/exceptions';
-import { IUserStore, User, UserDto } from './user';
+import { IUserStore, User } from './user';
 import { AUTH_USER_STORE } from './constants';
 
 type JwtResponse = { accessToken: string; expiresIn: number };
@@ -66,10 +66,18 @@ export class AuthService implements OnModuleInit {
     };
   }
 
-  async register(dto: UserDto, password: string): Promise<User> {
+  async register(
+    username: string,
+    password: string,
+    data?: Record<string, any>,
+  ): Promise<User> {
     // TODO validate DTO
     const hash = await this.hashPassword(password);
-    return this.userStore.create(dto, hash);
+    return this.userStore.create(username, hash, data);
+  }
+
+  async updateUsername(id: string, username: string): Promise<boolean> {
+    return this.userStore.updateUsername(id, username);
   }
 
   async updatePassword(id: string, password: string): Promise<boolean> {

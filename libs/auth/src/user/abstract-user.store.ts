@@ -1,15 +1,20 @@
 import { User } from './user';
-import { UserDto } from './user.dto';
 import { IUserStore } from './i-user.store';
 
 export abstract class AbstractUserStore implements IUserStore {
-  abstract create(dto: UserDto, passwordHash: string): Promise<User>;
+  abstract create(
+    username: string,
+    passwordHash: string,
+    data?: Record<string, any>,
+  ): Promise<User>;
 
   abstract findById(id: string): Promise<User>;
 
   abstract findByUsername(username: string): Promise<User>;
 
   abstract update(id: string, data: Partial<User>): Promise<User>;
+
+  abstract updateUsername(id: string, username: string): Promise<boolean>;
 
   updateRequiredAction(id: string, action: string): Promise<boolean> {
     return this.update(id, { requiredAction: action }).then(() => true);

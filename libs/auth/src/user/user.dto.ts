@@ -1,5 +1,5 @@
-export class UserDto {
-  public username: string;
+export class UserDataDto {
+  public name: string;
   public workspace?: string;
   public roles?: string[];
   public actionRequired?: string;

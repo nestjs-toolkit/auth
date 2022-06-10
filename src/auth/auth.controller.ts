@@ -25,9 +25,7 @@ export class AuthController {
   async register(@Body() body) {
     try {
       const user = await this.authService.register(
-        {
-          username: body.username,
-        },
+        body.username,
         body.password,
       );
 

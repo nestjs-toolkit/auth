@@ -24,13 +24,7 @@ describe('AuthController (e2e)', () => {
 
     authService = app.get(AuthService);
 
-    user = await authService.register(
-      {
-        username: 'admin',
-        roles: ['ADMIN'],
-      },
-      '123456',
-    );
+    user = await authService.register('admin', '123456', { roles: ['ADMIN'] });
   });
 
   afterAll(async () => {
@@ -240,6 +234,26 @@ describe('AuthController (e2e)', () => {
   });
 
   describe('Update user', () => {
+    it('Update Username', async () => {
+      const luke = await authService.register('luke', '123456');
+
+      const username = 'bilu2';
+      const result = await authService.updateUsername(luke.id, username);
+      expect(result).toBeTruthy();
+
+      const lukeUpdated = await authService.findById(luke.id);
+      expect(lukeUpdated.username).toBe(username);
+    });
+
+    it('Update already username ', async () => {
+      const luke = await authService.register('luke', '123456');
+      const leia = await authService.register('leia', '123456');
+
+      expect(
+        authService.updateUsername(leia.id, luke.username),
+      ).rejects.toThrow('Username already exists');
+    });
+
     it('Update Password', async () => {
       const pwd = '121212';
       const result = await authService.updatePassword(user.id, pwd);
