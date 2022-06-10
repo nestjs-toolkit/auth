@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { AUTH_USER_STORE, ToolkitAuthModule } from '@nestjs-toolkit/auth';
+import { JwtAuthGuard } from '@nestjs-toolkit/auth/guards';
+import { FakeUserStore } from './auth/fake-user.store';
 import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
-import { FakeUserStoreService } from './auth/fake-user-store.service';
 
 @Module({
   imports: [ToolkitAuthModule.forRoot(), AuthModule],
@@ -10,8 +12,17 @@ import { FakeUserStoreService } from './auth/fake-user-store.service';
   providers: [
     {
       provide: AUTH_USER_STORE,
-      useClass: FakeUserStoreService,
+      useClass: FakeUserStore,
     },
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    // TODO: add AclGuard
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: AclGuard,
+    // },
   ],
 })
 export class AppModule {}

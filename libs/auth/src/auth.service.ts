@@ -5,6 +5,7 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { UnauthorizedException } from '@nestjs-toolkit/base/exceptions';
 import { IUserStore, User, UserDto } from './user';
 import { AUTH_USER_STORE } from './constants';
+import { JwtSignOptions } from '@nestjs/jwt/dist/interfaces';
 
 type JwtResponse = { accessToken: string; expiresIn: number };
 
@@ -17,7 +18,7 @@ export class AuthService implements OnModuleInit {
     private readonly jwtService: JwtService,
   ) {}
 
-  onModuleInit() {
+  public onModuleInit() {
     this.userStore = this.moduleRef.get(AUTH_USER_STORE, { strict: false });
   }
 
@@ -43,11 +44,17 @@ export class AuthService implements OnModuleInit {
     return this.signJwt(user);
   }
 
-  private signJwt(user: User, additionalPayload?: any): JwtResponse {
+  public signJwt(
+    user: User,
+    additionalPayload?: any,
+    options?: JwtSignOptions,
+  ): JwtResponse {
     const payload = this.userStore.presentJwtPayload(user, additionalPayload);
+    payload.user.id = undefined;
 
     const token = this.jwtService.sign(payload, {
       subject: user.id,
+      ...options,
       // todo get from config
     });
 

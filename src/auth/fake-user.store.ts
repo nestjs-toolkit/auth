@@ -5,7 +5,7 @@ import { AbstractUserStore, User, UserDto } from '@nestjs-toolkit/auth/user';
 const DATA_USER: Array<User> = [];
 
 @Injectable()
-export class FakeUserStoreService extends AbstractUserStore {
+export class FakeUserStore extends AbstractUserStore {
   async create(dto: UserDto, passwordHash: string): Promise<User> {
     const hasUser = await this.findByUsername(dto.username);
 
