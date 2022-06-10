@@ -51,10 +51,10 @@ export class FakeUserStore extends AbstractUserStore {
       throw new Error('User not found');
     }
 
-    DATA_USER[indexOfUser] = {
+    DATA_USER[indexOfUser] = new UserEntity({
       ...DATA_USER[indexOfUser],
       ...data,
-    };
+    });
 
     return new UserAuthenticated(DATA_USER[indexOfUser]);
   }
