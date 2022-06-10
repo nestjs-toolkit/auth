@@ -1,12 +1,12 @@
 {
-  "name": "auth-toolkit",
-  "version": "0.0.1",
-  "description": "",
-  "author": "",
-  "private": true,
-  "license": "UNLICENSED",
+  "name": "@nestjs-toolkit/auth",
+  "version": "1.0.0",
+  "description": "Auth nestjs toolkit",
+  "author": "Valmir Barbosa",
+  "license": "MIT",
   "scripts": {
     "prebuild": "rimraf dist",
+    "postbuild": "cp package.json dist/libs/auth/package.json",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start",
@@ -18,37 +18,53 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "test:e2e:cov": "jest --config ./test/jest-e2e.json --runInBand --coverage",
+    "doc": "doctoc .docs/ --title='## Summary'",
+    "lib:build": "yarn prebuild && nest build auth --tsc && yarn postbuild"
   },
   "dependencies": {
-    "@nestjs/common": "^8.4.6",
-    "@nestjs/core": "^8.4.6",
-    "@nestjs/platform-express": "^8.4.6",
-    "reflect-metadata": "^0.1.13",
-    "rimraf": "^3.0.2",
-    "rxjs": "^7.5.5"
+    "@nestjs-toolkit/base": "^1.0.1",
+    "@nestjs/jwt": "^8.0.1",
+    "@nestjs/passport": "^8.2.1",
+    "bcrypt": "^5.0.1",
+    "jsonwebtoken": "^8.5.1",
+    "passport": "^0.6.0",
+    "passport-jwt": "^4.0.0",
+    "passport-local": "^1.0.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^8.2.6",
+    "@nestjs/common": "^8.4.6",
+    "@nestjs/core": "^8.4.6",
+    "@nestjs/graphql": "^10.0.15",
+    "@nestjs/platform-fastify": "^8.4.6",
     "@nestjs/schematics": "^8.0.11",
     "@nestjs/testing": "^8.4.6",
-    "@types/express": "^4.17.13",
-    "@types/jest": "27.5.2",
-    "@types/node": "^16.11.39",
-    "@types/supertest": "^2.0.12",
+    "@types/bcrypt": "^5.0.0",
+    "@types/jest": "28.1.1",
+    "@types/node": "^17.0.41",
+    "@types/passport-jwt": "^3.0.6",
+    "@types/passport-local": "^1.0.34",
     "@typescript-eslint/eslint-plugin": "^5.27.1",
     "@typescript-eslint/parser": "^5.27.1",
+    "doctoc": "^2.2.0",
     "eslint": "^8.17.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "jest": "^27.5.1",
+    "graphql": "^16.5.0",
+    "jest": "^28.1.1",
+    "moment-timezone": "^0.5.34",
     "prettier": "^2.6.2",
+    "reflect-metadata": "^0.1.13",
+    "rimraf": "^3.0.2",
+    "rxjs": "^7.5.5",
     "source-map-support": "^0.5.21",
-    "supertest": "^6.2.3",
-    "ts-jest": "^27.1.5",
+    "ts-jest": "^28.0.4",
     "ts-loader": "^9.3.0",
+    "ts-morph": "^15.1.0",
     "ts-node": "^10.8.1",
-    "tsconfig-paths": "^3.14.1",
+    "tsconfig-paths": "^4.0.0",
     "typescript": "^4.7.3"
   },
   "jest": {
@@ -65,7 +81,7 @@
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],
-    "coverageDirectory": "./coverage",
+    "coverageDirectory": "./.coverage",
     "testEnvironment": "node",
     "roots": [
       "<rootDir>/src/",
@@ -74,6 +90,9 @@
     "moduleNameMapper": {
       "^@nestjs-toolkit/auth(|/.*)$": "<rootDir>/libs/auth/src/$1"
     }
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
   },
   "packageManager": "yarn@3.2.1"
 }
