@@ -2,10 +2,10 @@ import * as bcrypt from 'bcrypt';
 import { ModuleRef } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Injectable, OnModuleInit } from '@nestjs/common';
+import { JwtSignOptions } from '@nestjs/jwt/dist/interfaces';
 import { UnauthorizedException } from '@nestjs-toolkit/base/exceptions';
 import { IUserStore, User, UserDto } from './user';
 import { AUTH_USER_STORE } from './constants';
-import { JwtSignOptions } from '@nestjs/jwt/dist/interfaces';
 
 type JwtResponse = { accessToken: string; expiresIn: number };
 
@@ -70,6 +70,34 @@ export class AuthService implements OnModuleInit {
     // TODO validate DTO
     const hash = await this.hashPassword(password);
     return this.userStore.create(dto, hash);
+  }
+
+  async updatePassword(id: string, password: string): Promise<boolean> {
+    const hash = await this.hashPassword(password);
+    return this.userStore.updatePassword(id, hash);
+  }
+
+  async updateRequiredAction(
+    id: string,
+    changePassword: string,
+  ): Promise<boolean> {
+    return this.userStore.updateRequiredAction(id, changePassword);
+  }
+
+  async updateWorkspace(id: string, workspace: string): Promise<boolean> {
+    return this.userStore.updateWorkspace(id, workspace);
+  }
+
+  async updateRoles(id: string, roles: string[]): Promise<boolean> {
+    return this.userStore.updateRoles(id, roles);
+  }
+
+  async findById(id: string): Promise<User> {
+    return this.userStore.findById(id);
+  }
+
+  async findByUsername(username: string): Promise<User> {
+    return this.userStore.findByUsername(username);
   }
 
   private async comparePassword(

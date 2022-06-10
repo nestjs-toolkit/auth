@@ -9,7 +9,10 @@ import {
 } from '@nestjs/common';
 import { AuthPublic } from '@nestjs-toolkit/auth/decorators';
 import { AuthService } from '@nestjs-toolkit/auth';
-import { UnauthorizedException } from '@nestjs-toolkit/base/exceptions';
+import {
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs-toolkit/base/exceptions';
 
 @Controller('auth')
 export class AuthController {
@@ -20,14 +23,19 @@ export class AuthController {
   @AuthPublic()
   @Post('register')
   async register(@Body() body) {
-    const user = await this.authService.register(
-      {
-        username: body.username,
-      },
-      body.password,
-    );
+    try {
+      const user = await this.authService.register(
+        {
+          username: body.username,
+        },
+        body.password,
+      );
 
-    return { ...user, password: undefined };
+      return { ...user, password: undefined };
+    } catch (e) {
+      this.logger.error(e);
+      throw new InternalServerErrorException(e.message, 'REGISTER_FAILED');
+    }
   }
 
   @AuthPublic()

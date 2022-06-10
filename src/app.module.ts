@@ -7,7 +7,15 @@ import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [ToolkitAuthModule.forRoot(), AuthModule],
+  imports: [
+    ToolkitAuthModule.forRoot({
+      jwtSecret: 'jwt-secret',
+      jwtSignOptions: {
+        audience: 'test-audience',
+      },
+    }),
+    AuthModule,
+  ],
   controllers: [AppController],
   providers: [
     {

@@ -12,7 +12,7 @@
   "collectCoverageFrom": [
     "**/*.(t|j)s"
   ],
-  "coverageDirectory": ".coverage",
+  "coverageDirectory": "./.coverage",
   "testEnvironment": "node",
   "roots": [
     "<rootDir>/test"
@@ -34,6 +34,8 @@
     }
   },
   "testPathIgnorePatterns": [
+    "<rootDir>/../.docs/",
+    "<rootDir>/../.yarn/",
     "<rootDir>/../.tmp/"
   ]
 }

@@ -28,8 +28,8 @@ jobs:
       - name: Unit test
         run: yarn test
 
-      - name: Testing e2e
-        run: yarn test:e2e
+      - name: Testing e2e + coverage
+        run: yarn test:e2e:cov
 
       - name: Lib build
         run: yarn lib:build

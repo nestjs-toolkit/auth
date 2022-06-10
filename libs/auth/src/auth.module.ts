@@ -1,7 +1,6 @@
 import { JwtModule } from '@nestjs/jwt';
 import { DynamicModule, Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
-import { PasswordService } from './password';
 import { JwtStrategy } from './strategies';
 import { AuthService } from './auth.service';
 import { AuthConfig } from './auth.config';
@@ -17,13 +16,13 @@ const defaultConfig: AuthConfig = {
 
 @Module({})
 export class ToolkitAuthModule {
-  static forRoot(config?: Partial<AuthConfig>): DynamicModule {
+  static forRoot(config: Partial<AuthConfig>): DynamicModule {
     const customConfig = {
       ...defaultConfig,
       config,
       jwtSignOptions: {
         ...defaultConfig.jwtSignOptions,
-        ...config?.jwtSignOptions,
+        ...config.jwtSignOptions,
       },
     };
 
@@ -47,9 +46,8 @@ export class ToolkitAuthModule {
         },
         JwtStrategy,
         AuthService,
-        PasswordService,
       ],
-      exports: [AuthService, PasswordService, JwtStrategy],
+      exports: [AuthService],
       global: true,
     };
   }

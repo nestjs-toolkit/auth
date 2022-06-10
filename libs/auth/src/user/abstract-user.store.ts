@@ -11,15 +11,15 @@ export abstract class AbstractUserStore implements IUserStore {
 
   abstract update(id: string, data: Partial<User>): Promise<User>;
 
-  setRequiredAction(id: string, action: string): Promise<boolean> {
+  updateRequiredAction(id: string, action: string): Promise<boolean> {
     return this.update(id, { requiredAction: action }).then(() => true);
   }
 
-  setRoles(id: string, roles: string[]): Promise<boolean> {
+  updateRoles(id: string, roles: string[]): Promise<boolean> {
     return this.update(id, { roles }).then(() => true);
   }
 
-  setWorkspace(id: string, workspace: string): Promise<boolean> {
+  updateWorkspace(id: string, workspace: string): Promise<boolean> {
     return this.update(id, { workspace }).then(() => true);
   }
 
@@ -37,7 +37,7 @@ export abstract class AbstractUserStore implements IUserStore {
       user: {
         id: user.id,
         username: user.username,
-        roles: user.roles || [],
+        roles: user.roles,
       },
     };
   }
