@@ -5,7 +5,7 @@ import {
 } from '@nestjs/platform-fastify';
 import {
   AUTH_USER_STORE,
-  AuthConfig,
+  AuthModuleOptions,
   AuthService,
   ToolkitAuthModule,
 } from '@nestjs-toolkit/auth';
@@ -71,7 +71,7 @@ describe('AuthModule (e2e)', () => {
         imports: [
           ToolkitAuthModule.forRootAsync({
             imports: [ConfigModule],
-            useFactory: (conf): AuthConfig => ({
+            useFactory: (conf): AuthModuleOptions => ({
               jwtSecret: 'jwt-secret-factory',
               saltPassword: 'salt-factory',
               jwtSignOptions: {

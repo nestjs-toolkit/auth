@@ -1,12 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import {
-  AuthConfig,
-  AuthOptionsFactory,
-} from '@nestjs-toolkit/auth/auth.interface';
+import { AuthModuleOptions, AuthOptionsFactory } from '@nestjs-toolkit/auth';
 
 @Injectable()
 export class ConfigService implements AuthOptionsFactory {
-  createOptions(): AuthConfig {
+  createOptions(): AuthModuleOptions {
     return {
       jwtSecret: 'jwt-secret-factory',
       saltPassword: 'salt-factory',

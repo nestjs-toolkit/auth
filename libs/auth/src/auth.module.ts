@@ -1,82 +1,97 @@
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { DynamicModule, Module } from '@nestjs/common';
-import { Provider } from '@nestjs/common/interfaces/modules/provider.interface';
+import { DynamicModule, Global, Module, Provider } from '@nestjs/common';
+import { authToJwtModuleOptions, createAuthProvider } from './auth.providers';
 import { AuthService } from './auth.service';
 import {
-  AuthConfig,
   AuthModuleAsyncOptions,
+  AuthModuleOptions,
   AuthOptionsFactory,
-} from './auth.interface';
-import { CoreAuthModule } from './core-auth.module';
-import { AUTH_CONFIG } from './constants';
+} from './interfaces';
+import { AUTH_MODULE_OPTIONS } from './constants';
+import { JwtStrategy } from './strategies';
 import { AclService } from './acl';
 
-const defaultConfig: Partial<AuthConfig> = {
-  jwtSignOptions: {
-    audience: 'api-toolkit',
-    expiresIn: '30m',
-  },
-};
-
+@Global()
 @Module({
-  providers: [AuthService, AclService],
+  providers: [AuthService, AclService, JwtStrategy],
   exports: [AuthService, AclService],
 })
 export class ToolkitAuthModule {
-  static forRoot(config: AuthConfig): DynamicModule {
-    const customConfig = this.makeConfigure(config);
-
+  static forRoot(options: AuthModuleOptions): DynamicModule {
     return {
       module: ToolkitAuthModule,
-      imports: [CoreAuthModule],
-      providers: [
-        {
-          provide: AUTH_CONFIG,
-          useValue: customConfig,
-        },
-      ],
-      exports: [AUTH_CONFIG],
-      global: true,
+      imports: [PassportModule, this.makeJwtModule(options)],
+      providers: [createAuthProvider(options)],
     };
   }
 
   static forRootAsync(options: AuthModuleAsyncOptions): DynamicModule {
-    let authConfigProvider: Provider;
+    return {
+      module: ToolkitAuthModule,
+      imports: [...options.imports, this.makeJwtModuleAsync(options)],
+      providers: this.createAsyncProviders(options),
+    };
+  }
 
+  private static createAsyncProviders(
+    options: AuthModuleAsyncOptions,
+  ): Provider[] {
+    if (options.useExisting || options.useFactory) {
+      return [this.createAsyncOptionsProvider(options)];
+    }
+
+    return [
+      this.createAsyncOptionsProvider(options),
+      {
+        provide: options.useClass,
+        useClass: options.useClass,
+      },
+    ];
+  }
+
+  private static createAsyncOptionsProvider(
+    options: AuthModuleAsyncOptions,
+  ): Provider {
     if (options.useFactory) {
-      authConfigProvider = {
-        provide: AUTH_CONFIG,
-        useFactory: async (...args: any[]) => await options.useFactory(...args),
+      return {
+        provide: AUTH_MODULE_OPTIONS,
+        useFactory: options.useFactory,
         inject: options.inject || [],
-      };
-    } else {
-      authConfigProvider = {
-        provide: AUTH_CONFIG,
-        useFactory: async (optionsFactory: AuthOptionsFactory) =>
-          await optionsFactory.createOptions(),
-        inject: [options.useExisting || options.useClass],
       };
     }
 
     return {
-      module: ToolkitAuthModule,
-      imports: [...(options.imports || []), CoreAuthModule],
-      providers: [authConfigProvider],
-      exports: [authConfigProvider],
-      global: true,
+      provide: AUTH_MODULE_OPTIONS,
+      useFactory: async (optionsFactory: AuthOptionsFactory) =>
+        await optionsFactory.createOptions(),
+      inject: [options.useExisting || options.useClass],
     };
   }
 
-  private static makeConfigure(config: AuthConfig): AuthConfig {
-    return {
-      ...defaultConfig,
-      ...config,
-      jwtSignOptions: Object.assign(
-        {},
-        defaultConfig.jwtSignOptions,
-        config.jwtSignOptions,
-      ),
-    };
+  private static makeJwtModule(options: AuthModuleOptions) {
+    return JwtModule.register(authToJwtModuleOptions(options));
+  }
+
+  private static makeJwtModuleAsync(asyncOptions: AuthModuleAsyncOptions) {
+    if (asyncOptions.useFactory) {
+      return JwtModule.registerAsync({
+        imports: asyncOptions.imports,
+        useFactory: async (...args: any[]) => {
+          const options = await asyncOptions.useFactory(...args);
+          return authToJwtModuleOptions(options);
+        },
+        inject: asyncOptions.inject || [],
+      });
+    }
+
+    return JwtModule.registerAsync({
+      imports: asyncOptions.imports,
+      useFactory: async (optionsFactory: AuthOptionsFactory) => {
+        const options = await optionsFactory.createOptions();
+        return authToJwtModuleOptions(options);
+      },
+      inject: [asyncOptions.useExisting || asyncOptions.useClass],
+    });
   }
 }

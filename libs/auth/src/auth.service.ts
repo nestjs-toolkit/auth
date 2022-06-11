@@ -4,9 +4,9 @@ import { JwtService } from '@nestjs/jwt';
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { JwtSignOptions } from '@nestjs/jwt/dist/interfaces';
 import { UnauthorizedException } from '@nestjs-toolkit/base/exceptions';
+import { AuthModuleOptions } from './interfaces';
+import { AUTH_MODULE_OPTIONS, AUTH_USER_STORE } from './constants';
 import { IUserStore, UserAuthenticated } from './user';
-import { AUTH_CONFIG, AUTH_USER_STORE } from './constants';
-import { AuthConfig } from './auth.interface';
 
 type JwtResponse = { accessToken: string; expiresIn: number };
 
@@ -14,8 +14,8 @@ type JwtResponse = { accessToken: string; expiresIn: number };
 export class AuthService implements OnModuleInit {
   private userStore: IUserStore;
 
-  @Inject(AUTH_CONFIG)
-  private readonly config: AuthConfig;
+  @Inject(AUTH_MODULE_OPTIONS)
+  private readonly config: AuthModuleOptions;
 
   constructor(
     private readonly moduleRef: ModuleRef,
@@ -132,7 +132,7 @@ export class AuthService implements OnModuleInit {
     return bcrypt.hash(password, this.config.saltPassword);
   }
 
-  public getConfig(): AuthConfig {
+  public getConfig(): AuthModuleOptions {
     return {
       ...this.config,
       jwtSignOptions: {
