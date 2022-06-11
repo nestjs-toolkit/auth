@@ -3,9 +3,9 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
-import { AppModule } from '../src/app.module';
 import { AuthService } from '@nestjs-toolkit/auth';
 import { UserAuthenticated } from '@nestjs-toolkit/auth/user';
+import { AppModule } from '../src/app.module';
 
 describe('AuthController (e2e)', () => {
   let app: NestFastifyApplication;
@@ -20,7 +20,7 @@ describe('AuthController (e2e)', () => {
     app = moduleFixture.createNestApplication(new FastifyAdapter());
 
     await app.init();
-    //await app.getHttpAdapter().getInstance().ready();
+    await app.getHttpAdapter().getInstance().ready();
 
     authService = app.get(AuthService);
 
@@ -83,6 +83,7 @@ describe('AuthController (e2e)', () => {
         url: '/auth/login',
         payload: dto,
       });
+
       const body = response.json();
 
       console.log(body);
@@ -213,8 +214,6 @@ describe('AuthController (e2e)', () => {
         '123456',
       );
 
-      console.log(accessToken);
-
       const response = await app.inject({
         method: 'GET',
         url: '/auth/me',
@@ -230,6 +229,28 @@ describe('AuthController (e2e)', () => {
       expect(response.statusCode).toBe(200);
       expect(body.id).toBe(user.id);
       expect(body.username).toBe(user.username);
+    });
+
+    it('JWT Audience invalid', async () => {
+      const { accessToken } = authService.signJwt(user, null, {
+        audience: 'invalid',
+      });
+
+      console.log(accessToken);
+
+      const response = await app.inject({
+        method: 'GET',
+        url: '/auth/me',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const body = response.json();
+
+      console.log(body);
+
+      expect(response.statusCode).toBe(401);
     });
   });
 

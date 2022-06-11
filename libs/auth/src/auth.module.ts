@@ -7,11 +7,10 @@ import { AuthConfig } from './auth.config';
 import { AUTH_CONFIG } from './constants';
 import { AclService } from './acl';
 
-const defaultConfig: AuthConfig = {
-  jwtSecret: 'secret-test',
+const defaultConfig: Partial<AuthConfig> = {
   jwtSignOptions: {
     audience: 'api-toolkit',
-    expiresIn: '1h',
+    expiresIn: '30m',
   },
 };
 
@@ -20,11 +19,12 @@ export class ToolkitAuthModule {
   static forRoot(config: AuthConfig): DynamicModule {
     const customConfig = {
       ...defaultConfig,
-      config,
-      jwtSignOptions: {
-        ...defaultConfig.jwtSignOptions,
-        ...config.jwtSignOptions,
-      },
+      ...config,
+      jwtSignOptions: Object.assign(
+        {},
+        defaultConfig.jwtSignOptions,
+        config.jwtSignOptions,
+      ),
     };
 
     return {

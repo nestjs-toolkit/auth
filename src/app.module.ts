@@ -11,8 +11,10 @@ import { AuthModule } from './auth/auth.module';
     ToolkitAuthModule.forRoot({
       jwtSecret: 'jwt-secret',
       jwtSignOptions: {
+        expiresIn: '3m',
         audience: 'test-audience',
       },
+      saltPassword: '$2b$10$E1rzRMj1XcEFTlCfdk0XCO',
     }),
     AuthModule,
   ],

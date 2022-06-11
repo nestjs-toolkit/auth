@@ -8,7 +8,7 @@ import {
   AuthService,
   ToolkitAuthModule,
 } from '@nestjs-toolkit/auth';
-import { IUserStore, UserAuthenticated } from '@nestjs-toolkit/auth/user';
+import { IUserStore } from '@nestjs-toolkit/auth/user';
 
 const mockStore: Partial<IUserStore> = {
   findByUsername: jest.fn().mockResolvedValue({ id: 'fake' }),
@@ -23,6 +23,7 @@ describe('AuthModule (e2e)', () => {
       imports: [
         ToolkitAuthModule.forRoot({
           jwtSecret: 'jwt-secret2',
+          saltPassword: '$2b$10$E1rzRMj1XcEFTlCfdk0XCO',
         }),
       ],
       providers: [

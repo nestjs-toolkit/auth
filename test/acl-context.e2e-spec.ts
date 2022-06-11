@@ -20,6 +20,7 @@ describe('AclContext', () => {
       imports: [
         ToolkitAuthModule.forRoot({
           jwtSecret: 'secret',
+          saltPassword: '$2b$10$E1rzRMj1XcEFTlCfdk0XCO',
         }),
       ],
       providers: [
