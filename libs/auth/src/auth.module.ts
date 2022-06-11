@@ -1,16 +1,16 @@
 import { JwtModule } from '@nestjs/jwt';
-import { DynamicModule, Module, ModuleMetadata, Type } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
-import { JwtStrategy } from './strategies';
+import { DynamicModule, Module } from '@nestjs/common';
+import { Provider } from '@nestjs/common/interfaces/modules/provider.interface';
 import { AuthService } from './auth.service';
 import {
   AuthConfig,
   AuthModuleAsyncOptions,
   AuthOptionsFactory,
 } from './auth.interface';
+import { CoreAuthModule } from './core-auth.module';
 import { AUTH_CONFIG } from './constants';
 import { AclService } from './acl';
-import { Provider } from '@nestjs/common/interfaces/modules/provider.interface';
 
 const defaultConfig: Partial<AuthConfig> = {
   jwtSignOptions: {
@@ -19,30 +19,24 @@ const defaultConfig: Partial<AuthConfig> = {
   },
 };
 
-@Module({})
+@Module({
+  providers: [AuthService, AclService],
+  exports: [AuthService, AclService],
+})
 export class ToolkitAuthModule {
   static forRoot(config: AuthConfig): DynamicModule {
     const customConfig = this.makeConfigure(config);
 
     return {
       module: ToolkitAuthModule,
-      imports: [
-        PassportModule,
-        JwtModule.register({
-          secret: customConfig.jwtSecret,
-          signOptions: customConfig.jwtSignOptions,
-        }),
-      ],
+      imports: [CoreAuthModule],
       providers: [
         {
           provide: AUTH_CONFIG,
           useValue: customConfig,
         },
-        JwtStrategy,
-        AuthService,
-        AclService,
       ],
-      exports: [AuthService, AclService],
+      exports: [AUTH_CONFIG],
       global: true,
     };
   }
@@ -67,21 +61,9 @@ export class ToolkitAuthModule {
 
     return {
       module: ToolkitAuthModule,
-      imports: [
-        ...(options.imports || []),
-        PassportModule,
-        JwtModule.registerAsync({
-          useFactory: async (conf: AuthConfig) => {
-            return {
-              secret: conf.jwtSecret,
-              signOptions: conf.jwtSignOptions,
-            };
-          },
-          inject: [AUTH_CONFIG],
-        }),
-      ],
-      providers: [authConfigProvider, JwtStrategy, AuthService, AclService],
-      exports: [authConfigProvider, AuthService, AclService],
+      imports: [...(options.imports || []), CoreAuthModule],
+      providers: [authConfigProvider],
+      exports: [authConfigProvider],
       global: true,
     };
   }

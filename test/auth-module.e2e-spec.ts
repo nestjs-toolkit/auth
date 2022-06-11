@@ -25,7 +25,7 @@ describe('AuthModule (e2e)', () => {
       const moduleFixture: TestingModule = await Test.createTestingModule({
         imports: [
           ToolkitAuthModule.forRoot({
-            jwtSecret: 'jwt-secret2',
+            jwtSecret: 'jwt-secret-1475',
             saltPassword: '$2b$10$E1rzRMj1XcEFTlCfdk0XCO',
           }),
         ],
@@ -57,6 +57,11 @@ describe('AuthModule (e2e)', () => {
       expect(user.id).toBe('fake');
 
       expect(mockStore.findByUsername).toHaveBeenCalledWith('bilu');
+    });
+
+    it('Get Config', async () => {
+      const audience = await authService.getConfig().jwtSecret;
+      expect(audience).toBe('jwt-secret-1475');
     });
   });
 
