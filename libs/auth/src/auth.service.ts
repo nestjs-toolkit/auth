@@ -6,7 +6,7 @@ import { JwtSignOptions } from '@nestjs/jwt/dist/interfaces';
 import { UnauthorizedException } from '@nestjs-toolkit/base/exceptions';
 import { IUserStore, UserAuthenticated } from './user';
 import { AUTH_CONFIG, AUTH_USER_STORE } from './constants';
-import { AuthConfig } from './auth.config';
+import { AuthConfig } from './auth.interface';
 
 type JwtResponse = { accessToken: string; expiresIn: number };
 
@@ -130,5 +130,14 @@ export class AuthService implements OnModuleInit {
     }
 
     return bcrypt.hash(password, this.config.saltPassword);
+  }
+
+  public getConfig(): AuthConfig {
+    return {
+      ...this.config,
+      jwtSignOptions: {
+        ...this.config.jwtSignOptions,
+      },
+    };
   }
 }

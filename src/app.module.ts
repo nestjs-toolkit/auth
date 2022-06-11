@@ -5,6 +5,7 @@ import { AclGuard, JwtAuthGuard } from '@nestjs-toolkit/auth/guards';
 import { FakeUserStore } from './auth/fake-user.store';
 import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from './config/config.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { AuthModule } from './auth/auth.module';
       saltPassword: '$2b$10$E1rzRMj1XcEFTlCfdk0XCO',
     }),
     AuthModule,
+    ConfigModule,
   ],
   controllers: [AppController],
   providers: [
