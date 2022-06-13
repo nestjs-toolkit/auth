@@ -1,17 +1,21 @@
 import * as bcrypt from 'bcrypt';
 import { ModuleRef } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { JwtSignOptions } from '@nestjs/jwt/dist/interfaces';
 import { UnauthorizedException } from '@nestjs-toolkit/base/exceptions';
+import { AuthModuleOptions } from './interfaces';
+import { AUTH_MODULE_OPTIONS, AUTH_USER_STORE } from './constants';
 import { IUserStore, UserAuthenticated } from './user';
-import { AUTH_USER_STORE } from './constants';
 
 type JwtResponse = { accessToken: string; expiresIn: number };
 
 @Injectable()
 export class AuthService implements OnModuleInit {
   private userStore: IUserStore;
+
+  @Inject(AUTH_MODULE_OPTIONS)
+  private readonly config: AuthModuleOptions;
 
   constructor(
     private readonly moduleRef: ModuleRef,
@@ -58,7 +62,6 @@ export class AuthService implements OnModuleInit {
     const token = this.jwtService.sign(payload, {
       subject: user.id,
       ...options,
-      // todo get from config
     });
 
     const decoded: any = this.jwtService.decode(token);
@@ -122,8 +125,19 @@ export class AuthService implements OnModuleInit {
   }
 
   public async hashPassword(password: string): Promise<string> {
-    // const salt = await bcrypt.genSalt();
-    const saltOrRounds = '$2b$10$E1rzRMj1XcEFTlCfdk0XCO'; // TODO get from config
-    return bcrypt.hash(password, saltOrRounds);
+    if (!this.config.saltPassword) {
+      throw new Error('Salt password is not configured');
+    }
+
+    return bcrypt.hash(password, this.config.saltPassword);
+  }
+
+  public getConfig(): AuthModuleOptions {
+    return {
+      ...this.config,
+      jwtSignOptions: {
+        ...this.config.jwtSignOptions,
+      },
+    };
   }
 }

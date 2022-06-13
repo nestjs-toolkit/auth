@@ -1,0 +1,1 @@
+export const DEMO_CONF_TOKEN = 'DEMO_CONF_TOKEN';
