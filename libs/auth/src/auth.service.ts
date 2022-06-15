@@ -57,7 +57,6 @@ export class AuthService implements OnModuleInit {
     options?: JwtSignOptions,
   ): JwtResponse {
     const payload = this.userStore.presentJwtPayload(user, additionalPayload);
-    payload.user.id = undefined;
 
     const token = this.jwtService.sign(payload, {
       subject: user.id,

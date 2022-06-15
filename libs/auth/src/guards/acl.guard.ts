@@ -14,15 +14,24 @@ export class AclGuard implements CanActivate {
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const req = ExtractContext.getRequest(context);
-    const user = req.user;
+    const payloadJwt = req.user;
+    const user = payloadJwt?.user
+      ? { ...payloadJwt.user, id: payloadJwt.sub }
+      : null;
+    const xAccount = payloadJwt?.xAccount;
     const acl = this.aclService.makeContext(user?.roles);
 
     if (ExtractContext.isGql(context)) {
       const ctx = ExtractContext.getContext(context);
-      ctx.user = user;
       ctx.acl = acl;
+      ctx.user = user;
+      ctx.xAccount = xAccount;
+
+      delete req['user'];
     } else {
       req.acl = acl;
+      req.user = user;
+      req.xAccount = xAccount;
     }
 
     const checkPerms = this.reflector.getAllAndOverride<string[]>(

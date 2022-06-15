@@ -40,10 +40,9 @@ export abstract class AbstractUserStore implements IUserStore {
     additionalPayload?: Record<string, any>,
   ): Record<string, any> {
     return {
-      account: user.account?.toString(),
+      xAccount: user.account?.toString(),
       ...additionalPayload,
       user: {
-        id: user.id,
         username: user.username,
         roles: user.roles,
       },

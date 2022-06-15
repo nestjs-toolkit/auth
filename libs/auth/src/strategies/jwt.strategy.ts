@@ -15,6 +15,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'toolkit_jwt') {
   }
 
   validate(payload: any): any {
-    return { id: payload.sub, ...payload.user };
+    return payload;
   }
 }

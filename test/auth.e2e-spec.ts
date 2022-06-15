@@ -24,7 +24,10 @@ describe('AuthController (e2e)', () => {
 
     authService = app.get(AuthService);
 
-    user = await authService.register('admin', '123456', { roles: ['ADMIN'] });
+    user = await authService.register('admin', '123456', {
+      roles: ['ADMIN'],
+      account: 'x1x2x3',
+    });
   });
 
   afterAll(async () => {
@@ -111,6 +114,7 @@ describe('AuthController (e2e)', () => {
       expect(response.statusCode).toBe(401);
       expect(body.message).toBe('Login or password is incorrect');
     });
+
     it('Invalid Password', async () => {
       const dto = {
         username: user.username,
@@ -204,8 +208,9 @@ describe('AuthController (e2e)', () => {
       console.log(body);
 
       expect(response.statusCode).toBe(200);
-      expect(body.id).toBe(user.id);
-      expect(body.username).toBe(user.username);
+      expect(body.user.id).toBe(user.id);
+      expect(body.user.username).toBe(user.username);
+      expect(body.xAccount).toBe(user.account);
     });
 
     it('Success with loginJwt', async () => {
@@ -227,8 +232,8 @@ describe('AuthController (e2e)', () => {
       console.log(body);
 
       expect(response.statusCode).toBe(200);
-      expect(body.id).toBe(user.id);
-      expect(body.username).toBe(user.username);
+      expect(body.user.id).toBe(user.id);
+      expect(body.user.username).toBe(user.username);
     });
 
     it('JWT Audience invalid', async () => {
