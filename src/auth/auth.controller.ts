@@ -8,12 +8,14 @@ import {
   Request,
 } from '@nestjs/common';
 import {
+  AclRequest,
   AuthAclPerms,
   AuthAclRoles,
   Public,
   UserRequest,
+  XAccountRequest,
 } from '@nestjs-toolkit/auth/decorators';
-import { AclService, AuthService } from '@nestjs-toolkit/auth';
+import { AclContext, AclService, AuthService } from '@nestjs-toolkit/auth';
 import {
   InternalServerErrorException,
   UnauthorizedException,
@@ -63,8 +65,11 @@ export class AuthController {
   }
 
   @Get('me')
-  me(@UserRequest() user: UserAuthenticated) {
-    return user;
+  me(
+    @UserRequest() user: UserAuthenticated,
+    @XAccountRequest() xAccount: string,
+  ) {
+    return { user, xAccount };
   }
 
   @Public()
@@ -83,10 +88,10 @@ export class AuthController {
 
   @Get('/acl/only-perms-post-write')
   @AuthAclPerms(PermissionEnum.PostWrite)
-  async onlyPermsPostRead(@Request() req) {
+  async onlyPermsPostRead(@AclRequest() acl: AclContext) {
     return {
       message: 'Authorized',
-      roles: req.acl.getRoles(),
+      roles: acl.getRoles(),
     };
   }
 }
