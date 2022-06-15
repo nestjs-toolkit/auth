@@ -232,8 +232,8 @@ describe('AuthController (e2e)', () => {
       console.log(body);
 
       expect(response.statusCode).toBe(200);
-      expect(body.id).toBe(user.id);
-      expect(body.username).toBe(user.username);
+      expect(body.user.id).toBe(user.id);
+      expect(body.user.username).toBe(user.username);
     });
 
     it('JWT Audience invalid', async () => {
