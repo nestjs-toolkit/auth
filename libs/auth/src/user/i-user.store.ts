@@ -17,7 +17,7 @@ export interface IUserStore {
 
   updateRoles(id: string, roles: string[]): Promise<boolean>;
 
-  updateAccount(id: string, account: string): Promise<boolean>;
+  updateXAccount(id: string, account: string): Promise<boolean>;
 
   updateRequiredAction(id: string, action: string): Promise<boolean>;
 

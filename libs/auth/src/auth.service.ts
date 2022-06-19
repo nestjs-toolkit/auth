@@ -4,6 +4,11 @@ import { JwtService } from '@nestjs/jwt';
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { JwtSignOptions } from '@nestjs/jwt/dist/interfaces';
 import { UnauthorizedException } from '@nestjs-toolkit/base/exceptions';
+import {
+  AuthUserNotFoundException,
+  AuthInvalidPasswordException,
+  AuthUserDisabledException,
+} from './exceptions';
 import { AuthModuleOptions } from './interfaces';
 import { AUTH_MODULE_OPTIONS, AUTH_USER_STORE } from './constants';
 import { IUserStore, UserAuthenticated } from './user';
@@ -32,12 +37,16 @@ export class AuthService implements OnModuleInit {
   ): Promise<UserAuthenticated> {
     const user = await this.userStore.findByUsername(username);
     if (!user) {
-      throw new UnauthorizedException('User not found', 'USER_NOT_FOUND');
+      throw new AuthUserNotFoundException();
     }
 
     const isMatch = await this.comparePassword(password, user.password);
     if (!isMatch) {
-      throw new UnauthorizedException('Invalid password', 'INVALID_PASSWORD');
+      throw new AuthInvalidPasswordException();
+    }
+
+    if (!user.isEnable) {
+      throw new AuthUserDisabledException();
     }
 
     return user;
@@ -96,8 +105,8 @@ export class AuthService implements OnModuleInit {
     return this.userStore.updateRequiredAction(id, changePassword);
   }
 
-  public async updateAccount(id: string, account: string): Promise<boolean> {
-    return this.userStore.updateAccount(id, account);
+  public async updateXAccount(id: string, account: string): Promise<boolean> {
+    return this.userStore.updateXAccount(id, account);
   }
 
   public async updateRoles(id: string, roles: string[]): Promise<boolean> {
