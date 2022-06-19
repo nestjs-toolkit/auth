@@ -8,6 +8,7 @@ import {
   AuthUserNotFoundException,
   AuthInvalidPasswordException,
   AuthUserDisabledException,
+  AuthInvalidArgsException,
 } from './exceptions';
 import { AuthModuleOptions } from './interfaces';
 import { AUTH_MODULE_OPTIONS, AUTH_USER_STORE } from './constants';
@@ -35,7 +36,12 @@ export class AuthService implements OnModuleInit {
     username: string,
     password: string,
   ): Promise<UserAuthenticated> {
+    if (!username || !password || username.length < 5 || password.length < 6) {
+      throw new AuthInvalidArgsException();
+    }
+
     const user = await this.userStore.findByUsername(username);
+
     if (!user) {
       throw new AuthUserNotFoundException();
     }

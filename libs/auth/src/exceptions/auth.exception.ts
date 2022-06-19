@@ -1,7 +1,6 @@
 export class AuthException extends Error {
-  readonly isAuthErro = true;
-  readonly reason: string;
-  readonly errorCode: string;
+  public internalReason = 'AUTH_EXCEPTION';
+  public errorCode = 'AUTH_EXCEPTION';
 
   constructor(message: string) {
     super(message);

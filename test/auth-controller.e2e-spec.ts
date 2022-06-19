@@ -84,7 +84,6 @@ describe('AuthController (e2e)', () => {
       };
 
       const { body, statusCode } = await requestRegister(dto);
-      console.log(body);
 
       expect(statusCode).toBe(201);
       expect(body.username).toBe(dto.username);
@@ -97,7 +96,6 @@ describe('AuthController (e2e)', () => {
       };
 
       const { body, statusCode } = await requestRegister(dto);
-      console.log(body);
 
       expect(statusCode).toBe(500);
       expect(body.message).toBe('User already exists');
@@ -107,11 +105,24 @@ describe('AuthController (e2e)', () => {
   describe('/login (POST)', () => {
     it('Success', async () => {
       const { body, statusCode } = await requestLogin(user.username, '123456');
-      console.log(body);
 
       expect(statusCode).toBe(200);
       expect(body.accessToken).toBeDefined();
       expect(body.expiresIn).toBeDefined();
+    });
+
+    it('Invalid args min password', async () => {
+      const { body, statusCode } = await requestLogin(user.username, '123');
+
+      expect(statusCode).toBe(401);
+      expect(body.message).toBe('Invalid credentials');
+    });
+
+    it('Invalid args min username', async () => {
+      const { body, statusCode } = await requestLogin('sss', '123456');
+
+      expect(statusCode).toBe(401);
+      expect(body.message).toBe('Invalid credentials');
     });
 
     it('User disabled', async () => {
@@ -128,7 +139,6 @@ describe('AuthController (e2e)', () => {
         dto.username,
         dto.password,
       );
-      console.log(body);
 
       expect(statusCode).toBe(401);
       expect(body.message).toBe('User is disabled');
@@ -136,7 +146,6 @@ describe('AuthController (e2e)', () => {
 
     it('Invalid Username', async () => {
       const { body, statusCode } = await requestLogin('xxxxxx', 'xxxxxx');
-      console.log(body);
 
       expect(statusCode).toBe(401);
       expect(body.message).toBe('Login or password is incorrect');
@@ -144,7 +153,6 @@ describe('AuthController (e2e)', () => {
 
     it('Invalid Password', async () => {
       const { body, statusCode } = await requestLogin(user.username, 'xxxxxx');
-      console.log(body);
 
       expect(statusCode).toBe(401);
       expect(body.message).toBe('Login or password is incorrect');
@@ -152,10 +160,9 @@ describe('AuthController (e2e)', () => {
 
     it('Empty Password', async () => {
       const { body, statusCode } = await requestLogin(user.username, '');
-      console.log(body);
 
       expect(statusCode).toBe(401);
-      expect(body.message).toBe('Login or password is incorrect');
+      expect(body.message).toBe('Invalid credentials');
     });
   });
 
