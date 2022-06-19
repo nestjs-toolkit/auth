@@ -6,7 +6,17 @@ import {
   UserEntity,
 } from '@nestjs-toolkit/auth/user';
 
-const DATA_USER: Array<UserEntity> = [];
+type User = {
+  id: string;
+  username: string;
+  roles?: string[];
+  account?: string;
+  requiredAction?: string;
+  password: string;
+  deletedAt?: Date;
+};
+
+const DATA_USER: Array<User> = [];
 
 @Injectable()
 export class FakeUserStore extends AbstractUserStore {
@@ -21,7 +31,7 @@ export class FakeUserStore extends AbstractUserStore {
       throw new Error('User already exists');
     }
 
-    const newUser: UserEntity = {
+    const newUser: User = {
       id: randomUUID(),
       username,
       password: passwordHash,
@@ -30,15 +40,17 @@ export class FakeUserStore extends AbstractUserStore {
 
     DATA_USER.push(newUser);
 
-    return Promise.resolve(new UserAuthenticated(newUser));
+    return Promise.resolve(this.presentUserAuthenticated(newUser));
   }
 
   async findById(id: string): Promise<UserEntity> {
-    return DATA_USER.find((u) => u.id === id) || null;
+    return this.presentUserEntity(DATA_USER.find((u) => u.id === id));
   }
 
   async findByUsername(username: string): Promise<UserEntity> {
-    return DATA_USER.find((u) => u.username === username) || null;
+    return this.presentUserEntity(
+      DATA_USER.find((u) => u.username === username),
+    );
   }
 
   async update(
@@ -51,12 +63,19 @@ export class FakeUserStore extends AbstractUserStore {
       throw new Error('User not found');
     }
 
-    DATA_USER[indexOfUser] = new UserEntity({
-      ...DATA_USER[indexOfUser],
-      ...data,
-    });
+    const dataUser: Partial<User> = { ...data };
 
-    return new UserAuthenticated(DATA_USER[indexOfUser]);
+    if (data.xAccount) {
+      delete dataUser['xAccount'];
+      dataUser.account = data.xAccount;
+    }
+
+    DATA_USER[indexOfUser] = {
+      ...DATA_USER[indexOfUser],
+      ...dataUser,
+    };
+
+    return this.presentUserAuthenticated(DATA_USER[indexOfUser]);
   }
 
   async updateUsername(id: string, username: string): Promise<boolean> {
@@ -67,5 +86,35 @@ export class FakeUserStore extends AbstractUserStore {
     }
 
     return this.update(id, { username }).then(() => true);
+  }
+
+  private presentUserAuthenticated(user: User): UserAuthenticated {
+    if (!user) {
+      return null;
+    }
+
+    return {
+      id: user.id,
+      username: user.username,
+      requiredAction: user.requiredAction,
+      roles: user.roles,
+      xAccount: user.account?.toString(),
+    };
+  }
+
+  private presentUserEntity(user: User): UserEntity {
+    if (!user) {
+      return null;
+    }
+
+    return {
+      id: user.id,
+      username: user.username,
+      requiredAction: user.requiredAction,
+      roles: user.roles,
+      xAccount: user.account?.toString(),
+      password: user.password,
+      isEnable: !user.deletedAt,
+    };
   }
 }

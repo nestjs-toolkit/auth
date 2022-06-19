@@ -13,6 +13,7 @@ import {
   UnauthorizedException,
 } from '@nestjs-toolkit/base/exceptions';
 import { UserAuthenticated } from '@nestjs-toolkit/auth/user';
+import { AuthException } from '@nestjs-toolkit/auth/exceptions';
 import { PermissionEnum, RoleEnum } from './enum';
 
 @Controller('auth')
@@ -49,10 +50,12 @@ export class AuthController {
       return this.authService.signJwt(user);
     } catch (e) {
       this.logger.error(e);
-      throw new UnauthorizedException(
-        'Login or password is incorrect',
-        'LOGIN_FAILED',
-      );
+
+      if (e instanceof AuthException) {
+        throw new UnauthorizedException(e.message, e.errorCode);
+      }
+
+      throw new UnauthorizedException('Failed to login', 'LOGIN_FAILED');
     }
   }
 

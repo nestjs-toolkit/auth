@@ -27,8 +27,8 @@ export abstract class AbstractUserStore implements IUserStore {
     return this.update(id, { roles }).then(() => true);
   }
 
-  updateAccount(id: string, account: string): Promise<boolean> {
-    return this.update(id, { account }).then(() => true);
+  updateXAccount(id: string, account: string): Promise<boolean> {
+    return this.update(id, { xAccount: account }).then(() => true);
   }
 
   updatePassword(id: string, passwordHash: string): Promise<boolean> {
@@ -40,7 +40,7 @@ export abstract class AbstractUserStore implements IUserStore {
     additionalPayload?: Record<string, any>,
   ): Record<string, any> {
     return {
-      xAccount: user.account?.toString(),
+      xAccount: user.xAccount?.toString(),
       ...additionalPayload,
       user: {
         username: user.username,
